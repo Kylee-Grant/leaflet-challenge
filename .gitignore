@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Hide rubric
+Leaflet_Grading_Rubric.pdf
+
+# Hide .DS_Store
+.DS_Store
+
+# Hide resources folder
+/resources
