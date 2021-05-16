@@ -35,7 +35,7 @@ function createMap(earthquakeInfo) {
     
     // Create a map object.
     var myMap = L.map("map", {
-        center: [15.5994, -28.6731],
+        center: [30.0000, -20.0000],
         zoom: 2
     });
 
@@ -59,9 +59,38 @@ function createMap(earthquakeInfo) {
         L.circle(earthquakeInfo[i].coordinates, {
             color: "white",
             fillColor: "blue",
-            fillOpacity: 0.05 * earthquakeInfo[i].dpt, // QUESTION: https://stackoverflow.com/questions/6443990/javascript-calculate-brighter-colour
+            fillOpacity: 0.05 * earthquakeInfo[i].dpt, // UPDATE: https://stackoverflow.com/questions/6443990/javascript-calculate-brighter-colour
             // Adjust the radius
             radius: earthquakeInfo[i].mag * 50000
         }).bindPopup("<h1>" + earthquakeInfo[i].place + "</h1> <hr> <h3>Magnitude: " + earthquakeInfo[i].mag + "   ||   Depth: " + earthquakeInfo[i].dpt + "</h3>").addTo(myMap);
     };
+     
+    /* CREATE LEGEND */
+    // UPDATE: https://gis.stackexchange.com/questions/193161/add-legend-to-leaflet-map
+    var legend = L.control({ position: "bottomright" });
+    legend.onAdd = function() {
+       var div = L.DomUtil.create("div", "info legend");
+       var limits = geojson.options.limits;
+       var colors = geojson.options.colors;
+       var labels = [];
+   
+       // Add the minimum and maximum.
+       var legendInfo = "<h1>Teen Birth Rate</h1>" +
+         "<div class=\"labels\">" +
+           "<div class=\"min\">" + limits[0] + "</div>" +
+           "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
+         "</div>";
+   
+       div.innerHTML = legendInfo;
+   
+       limits.forEach(function(limit, index) {
+         labels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
+       });
+   
+       div.innerHTML += "<ul>" + labels.join("") + "</ul>";
+       return div;
+     };
+   
+     // Adding the legend to the map
+     legend.addTo(myMap);
 };
