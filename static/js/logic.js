@@ -20,8 +20,8 @@ function createFeatures(data){
     var earthquakeInfo = []; 
     data.features.forEach(function(earthquakeData) {
         earthquakeInfo.push({
-            title: earthquakeData.properties.title,
-            coordinates: [earthquakeData.geometry.coordinates[0], earthquakeData.geometry.coordinates[1]],
+            place: earthquakeData.properties.place,
+            coordinates: [earthquakeData.geometry.coordinates[1], earthquakeData.geometry.coordinates[0]],
             dpt: earthquakeData.geometry.coordinates[2],
             mag: earthquakeData.properties.mag
         });
@@ -34,9 +34,9 @@ function createFeatures(data){
 function createMap(earthquakeInfo) {
     
     // Create a map object.
-    var myMap = L.map("mapid", {
+    var myMap = L.map("map", {
         center: [15.5994, -28.6731],
-        zoom: 3
+        zoom: 2
     });
 
     // Create the tile layer that will be the background of our map.
@@ -59,9 +59,9 @@ function createMap(earthquakeInfo) {
         L.circle(earthquakeInfo[i].coordinates, {
             color: "white",
             fillColor: "blue",
-            fillOpacity: 0.1 * earthquakeInfo[i].dpt,
+            fillOpacity: 0.05 * earthquakeInfo[i].dpt, // QUESTION: https://stackoverflow.com/questions/6443990/javascript-calculate-brighter-colour
             // Adjust the radius
-            radius: earthquakeInfo[i].mag * 10000
-        }).bindPopup("<h1>" + earthquakeInfo[i].title + "</h1> <hr> <h3>Magnitude: " + earthquakeInfo[i].mag + "</h3>").addTo(myMap);
+            radius: earthquakeInfo[i].mag * 50000
+        }).bindPopup("<h1>" + earthquakeInfo[i].place + "</h1> <hr> <h3>Magnitude: " + earthquakeInfo[i].mag + "   ||   Depth: " + earthquakeInfo[i].dpt + "</h3>").addTo(myMap);
     };
 };
