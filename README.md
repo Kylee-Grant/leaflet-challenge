@@ -72,8 +72,6 @@ In this step, you will:
 
 Your final product will be assessed on the following metrics:
 
-<!-- CE add examples for the metrics? especially what do you mean by visual appearance and professionalism?-->
-
 * Completion of assigned tasks
 
 * Visual appearance

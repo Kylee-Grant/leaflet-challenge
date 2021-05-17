@@ -10,7 +10,7 @@ var queryUrl = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_we
 
 // Perform a GET request to the query URL
 d3.json(queryUrl).then(function (data) {
-  // Once we get a response, send the data.features object to the createFeatures function.
+  // Once we get a response, send the data object to the createFeatures function
   createFeatures(data);
 });
 
@@ -33,15 +33,15 @@ function createFeatures(data){
 /* START MAP */
 function createMap(earthquakeInfo) {
     
-    // Create a map object.
+  // Create a map object.
   var myMap = L.map("map", {
-      center: [30.0000, -20.0000],
-      zoom: 2
+    center: [30.0000, -20.0000],
+    zoom: 2
   });
 
-    // Create the tile layer that will be the background of our map.
+  // Create the tile layer that will be the background of our map.
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(myMap);
 
   /* VISUALIZE DATA */
@@ -55,18 +55,19 @@ function createMap(earthquakeInfo) {
   // Loop through the array, and create one marker for each object
   for (var i = 0; i < earthquakeInfo.length; i++) {
 
-  // Conditionals for coloring earthquake points: http://www.geo.mtu.edu/UPSeis/magnitude.html
-  // Using this method: https://levelup.gitconnected.com/color-scales-in-javascript-with-chroma-js-b9f59d2a68d7 
-    var color_scale = chroma.scale(['Aquamarine', 'Teal']);
+  // Choosing color for circles. Using this method: https://levelup.gitconnected.com/color-scales-in-javascript-with-chroma-js-b9f59d2a68d7 
+  // Chroma.js documentation: https://gka.github.io/chroma.js/ 
+    var color_scale = chroma.scale(['Lime', 'Yellow','Tomato']).mode('lab').gamma(2);
     color = color_scale((earthquakeInfo[i].dpt/10)).hex()
 
     // Add circles to the map.
     var circleLayer = L.circle(earthquakeInfo[i].coordinates, {
-      color: "transparent",
+      color: "DimGray",
+      weight: 0.5, 
       fillColor: color,
       fillOpacity: 0.75, 
       // Adjust the radius
-      radius: earthquakeInfo[i].mag * 50000
+      radius: earthquakeInfo[i].mag * 15000
     }).bindPopup("<h1>" + earthquakeInfo[i].place + "</h1> <hr> <h3>Magnitude: " + earthquakeInfo[i].mag + "   ||   Depth: " + earthquakeInfo[i].dpt + "</h3>")
     .addTo(myMap);
     // Allow mouseover function: http://jsfiddle.net/LnzN2/1233/
@@ -84,8 +85,9 @@ function createMap(earthquakeInfo) {
     var div = L.DomUtil.create("div", "legend");
     div.innerHTML += "<h4>All Earthquakes (Past 7 Days)</h4>";
     div.innerHTML += "<h6>Circle radius expands to reflect greater magnitude.</h6>";
-    div.innerHTML += '<i style="background: #7FFFD4"></i><span>Shallow Earthquake Depth</span><br>';
-    div.innerHTML += '<i style="background: #008080"></i><span>Deep Earthquake Depth</span><br>';
+    div.innerHTML += '<i style="background: #00FF00"></i><span>-10 to 10</span><br>';
+    div.innerHTML += '<i style="background: #FFFF00"></i><br>';
+    div.innerHTML += '<i style="background: #FF6347"></i><span>90+</span><br>';
   return div;
   };
   legend.addTo(myMap);
