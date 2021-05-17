@@ -34,63 +34,59 @@ function createFeatures(data){
 function createMap(earthquakeInfo) {
     
     // Create a map object.
-    var myMap = L.map("map", {
-        center: [30.0000, -20.0000],
-        zoom: 2
-    });
+  var myMap = L.map("map", {
+      center: [30.0000, -20.0000],
+      zoom: 2
+  });
 
     // Create the tile layer that will be the background of our map.
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(myMap);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(myMap);
 
-    /* VISUALIZE DATA */
-    // Plot all of the earthquakes from your data set based on their longitude and latitude.
-    // Data markers should reflect the magnitude of the earthquake by their size and and depth of the earthquake by color. 
-    // Earthquakes with higher magnitudes should appear larger and earthquakes with greater depth should appear darker in color.
-    // HINT: The depth of the earth can be found as the third coordinate for each earthquake.
-    // Include popups that provide additional information about the earthquake when a marker is clicked.
-    // Create a legend that will provide context for your map data.
+  /* VISUALIZE DATA */
+  // Plot all of the earthquakes from your data set based on their longitude and latitude.
+  // Data markers should reflect the magnitude of the earthquake by their size and and depth of the earthquake by color. 
+  // Earthquakes with higher magnitudes should appear larger and earthquakes with greater depth should appear darker in color.
+  // HINT: The depth of the earth can be found as the third coordinate for each earthquake.
+  // Include popups that provide additional information about the earthquake when a marker is clicked.
+  // Create a legend that will provide context for your map data.
 
-    // Loop through the array, and create one marker for each object
-    for (var i = 0; i < earthquakeInfo.length; i++) {
+  // Loop through the array, and create one marker for each object
+  for (var i = 0; i < earthquakeInfo.length; i++) {
 
-        // Add circles to the map.
-        L.circle(earthquakeInfo[i].coordinates, {
-            color: "white",
-            fillColor: "blue",
-            fillOpacity: 0.05 * earthquakeInfo[i].dpt, // UPDATE: https://stackoverflow.com/questions/6443990/javascript-calculate-brighter-colour
-            // Adjust the radius
-            radius: earthquakeInfo[i].mag * 50000
-        }).bindPopup("<h1>" + earthquakeInfo[i].place + "</h1> <hr> <h3>Magnitude: " + earthquakeInfo[i].mag + "   ||   Depth: " + earthquakeInfo[i].dpt + "</h3>").addTo(myMap);
-    };
-     
-    /* CREATE LEGEND */
-    // UPDATE: https://gis.stackexchange.com/questions/193161/add-legend-to-leaflet-map
-    var legend = L.control({ position: "bottomright" });
-    legend.onAdd = function() {
-       var div = L.DomUtil.create("div", "info legend");
-       var limits = geojson.options.limits;
-       var colors = geojson.options.colors;
-       var labels = [];
-   
-       // Add the minimum and maximum.
-       var legendInfo = "<h1>Teen Birth Rate</h1>" +
-         "<div class=\"labels\">" +
-           "<div class=\"min\">" + limits[0] + "</div>" +
-           "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
-         "</div>";
-   
-       div.innerHTML = legendInfo;
-   
-       limits.forEach(function(limit, index) {
-         labels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
-       });
-   
-       div.innerHTML += "<ul>" + labels.join("") + "</ul>";
-       return div;
-     };
-   
-     // Adding the legend to the map
-     legend.addTo(myMap);
+  // Conditionals for coloring earthquake points: http://www.geo.mtu.edu/UPSeis/magnitude.html
+  // Using this method: https://levelup.gitconnected.com/color-scales-in-javascript-with-chroma-js-b9f59d2a68d7 
+    var color_scale = chroma.scale(['Aquamarine', 'Teal']);
+    color = color_scale((earthquakeInfo[i].dpt/10)).hex()
+
+    // Add circles to the map.
+    var circleLayer = L.circle(earthquakeInfo[i].coordinates, {
+      color: "transparent",
+      fillColor: color,
+      fillOpacity: 0.75, 
+      // Adjust the radius
+      radius: earthquakeInfo[i].mag * 50000
+    }).bindPopup("<h1>" + earthquakeInfo[i].place + "</h1> <hr> <h3>Magnitude: " + earthquakeInfo[i].mag + "   ||   Depth: " + earthquakeInfo[i].dpt + "</h3>")
+    .addTo(myMap);
+    // Allow mouseover function: http://jsfiddle.net/LnzN2/1233/
+    circleLayer.on('mouseover', function(e) {
+      e.target.bringToFront();        
+    });
+      circleLayer.addTo(myMap);
+  };
+    
+  /* CREATE LEGEND */
+  // Resource: https://codepen.io/haakseth/pen/KQbjdO 
+  // Follow-up: https://stackoverflow.com/questions/49739119/legend-with-smooth-gradient-and-corresponding-labels
+  var legend = L.control({ position: "bottomright" });
+  legend.onAdd = function(map) {
+    var div = L.DomUtil.create("div", "legend");
+    div.innerHTML += "<h4>All Earthquakes (Past 7 Days)</h4>";
+    div.innerHTML += "<h6>Circle radius expands to reflect greater magnitude.</h6>";
+    div.innerHTML += '<i style="background: #7FFFD4"></i><span>Shallow Earthquake Depth</span><br>';
+    div.innerHTML += '<i style="background: #008080"></i><span>Deep Earthquake Depth</span><br>';
+  return div;
+  };
+  legend.addTo(myMap);
 };
